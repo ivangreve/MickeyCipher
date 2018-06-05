@@ -1,0 +1,162 @@
+package Mickey;
+
+import java.awt.EventQueue;
+import java.awt.Image;
+import java.awt.image.BufferedImage;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.BoxLayout;
+import java.awt.GridLayout;
+import javax.swing.JButton;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import javax.swing.SwingConstants;
+
+public class Mickey {
+
+	private JFrame frame;
+
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					Mickey window = new Mickey();
+					window.frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+
+	/**
+	 * Create the application.
+	 */
+	public Mickey() {
+		initialize();
+        
+	}
+	
+	private byte[] imageToByteArray(File imageToConvert) {
+		
+		try {
+			
+			byte[] imageInByte;
+			BufferedImage originalImage = ImageIO.read(imageToConvert);
+			ByteArrayOutputStream baos = new ByteArrayOutputStream();
+			ImageIO.write(originalImage, "jpg", baos);
+			baos.flush();
+			imageInByte = baos.toByteArray();
+		   
+		   
+			for(int i=0; i< imageInByte.length; i++) 
+				System.out.println(imageInByte[i]);
+		   
+			baos.close();
+			return imageInByte;
+
+		}catch(IOException e) {
+			return null;
+		}
+		
+	}
+	
+	private void bytesArrayToImg(byte[] arr) {
+		String pathImgFile = "C://koko.jpg";
+		try {			
+			InputStream in = new ByteArrayInputStream(arr);
+			BufferedImage bImageFromConvert = ImageIO.read(in);
+			ImageIO.write(bImageFromConvert, "jpg", new File(pathImgFile));
+			BufferedImage image = ImageIO.read(new File(pathImgFile));
+
+		    
+		}catch(IOException e) {
+		   e.printStackTrace();
+		}
+
+	}
+
+
+	/**
+	 * Initialize the contents of the frame.
+	 */
+	private void initialize() {
+		frame = new JFrame();
+		frame.setBounds(100, 100, 627, 500);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		frame.getContentPane().setLayout(null);
+		
+		JLabel lblNewLabel = new JLabel("Previsualizaci\u00F3n de imagen");
+		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		lblNewLabel.setBounds(48, 125, 481, 191);
+		frame.getContentPane().add(lblNewLabel);
+		
+		
+		JButton btnAbrirArchivo = new JButton("Seleccionar archivo...");
+		btnAbrirArchivo.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				JFileChooser fileChooser = new JFileChooser();
+
+				   if(fileChooser.showOpenDialog(frame) ==  JFileChooser.APPROVE_OPTION) {
+					   File imageFileToEncode = fileChooser.getSelectedFile();
+					   BufferedImage img = ImageIO.read(imageFileToEncode);
+			           ImageIcon icon = new ImageIcon(img);
+					   lblNewLabel.setIcon(icon);
+					   byte[] imageInByte = imageToByteArray(imageFileToEncode);
+					   
+					   if(imageInByte != null)
+						   bytesArrayToImg(imageInByte);
+					   else
+						   System.out.println("Error en la construcción de la imagen");
+			             
+				      } else {
+				         System.out.println("Ningún archivo fue seleccionado!");
+				      };
+					 		
+			}
+		});
+		btnAbrirArchivo.setBounds(32, 56, 137, 23);
+		frame.getContentPane().add(btnAbrirArchivo);
+		
+		JLabel lblNingnArchivoSeleccionado = new JLabel("Ning\u00FAn archivo seleccionado");
+		lblNingnArchivoSeleccionado.setBounds(210, 60, 319, 14);
+		frame.getContentPane().add(lblNingnArchivoSeleccionado);
+		
+		
+		JButton button = new JButton("Cifrar...");
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+			}
+		});
+		button.setBounds(32, 375, 137, 23);
+		frame.getContentPane().add(button);
+		
+		JLabel label = new JLabel("Ning\u00FAn archivo seleccionado");
+		label.setBounds(210, 379, 319, 14);
+		frame.getContentPane().add(label);
+		
+        ImageIcon image = new ImageIcon(new ImageIcon("C://koko.jpg").getImage().getScaledInstance(frame.getWidth(), frame.getHeight(),
+                Image.SCALE_DEFAULT));
+		
+
+	}
+}
