@@ -129,7 +129,7 @@ public class Mickey {
 					}
 			            
 				      } else {
-				         System.out.println("Ningún archivo fue seleccionado!");
+				         System.out.println("Ningï¿½n archivo fue seleccionado!");
 				      };
 					 		
 			}
@@ -143,11 +143,16 @@ public class Mickey {
 			public void actionPerformed(ActionEvent arg0) {
 				JFileChooser fileChooser = new JFileChooser();
 				   if(fileChooser.showSaveDialog(frame) ==  JFileChooser.APPROVE_OPTION) {
+					   final int BITMAP_START = 154;
 					   File fileToSave = fileChooser.getSelectedFile();
 					   byte [] b = imageToByteArray(imageFileToEncode);
-					   int [] bytes = new int [b.length]; //Integer.
-					   for (int i = 0; i < b.length; i++) {
-						   bytes[i] = b[i];
+					   int [] cipherBytes = new int [b.length - BITMAP_START]; //Integer.
+					   int [] headerBytes = new int [BITMAP_START]; //Integer.
+					   for (int i = 0; i < BITMAP_START; i++) {
+						   headerBytes[i] = b[i];
+					   }
+					   for (int i = BITMAP_START; i < b.length; i++) {
+						   cipherBytes[i - BITMAP_START] = b[i];
 					   }
 					   
 					   String key = textField.getText().substring(0, 10);
@@ -165,10 +170,13 @@ public class Mickey {
 					   }
 					   
 					   MickeyCipher cipher = new MickeyCipher(keyBytes, ivBytes);
-					   int[] fileContent = cipher.encrypt(bytes);
-					   byte[] array = new byte[fileContent.length] ;
+					   int[] fileContent = cipher.encrypt(cipherBytes);
+					   byte[] array = new byte[fileContent.length + headerBytes.length] ;
+					   for (int i = 0; i < headerBytes.length; i++) {
+						   array[i] = (byte) headerBytes[i];
+					   }
 					   for (int i = 0; i < fileContent.length; i++) {
-						   array[i] = (byte) fileContent[i];
+						   array[i + headerBytes.length] = (byte) fileContent[i];
 					   }
 					   try (FileOutputStream fos = new FileOutputStream(fileToSave)) {
 						   fos.write(array);
